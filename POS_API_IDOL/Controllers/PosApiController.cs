@@ -22,6 +22,11 @@ namespace POS_API_IDOL.Controllers
                 _logger = logger;
         }
 
+        /// <summary>
+        /// API will be called when the application get started to check if the terminal should be open
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("SignTerminal")]
         public IActionResult SignTerminal(SignTerminalRequest request)
         {
@@ -67,7 +72,11 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
-
+        /// <summary>
+        /// When customer choose to start a new transaction for checkout
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("StartTransaction")]
         public IActionResult StartTransaction(StartTransactionRequest request)
         {
@@ -98,7 +107,11 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
-
+        /// <summary>
+        /// When customer scan an item this API will check the product details
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("ProductDetails")]
         public IActionResult CheckProductDetails(CheckProductRequest request)
         {
@@ -142,7 +155,11 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
-
+        /// <summary>
+        /// When customer scan an item and the product exists, this API will update the transaction
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("AddToCart")]
         public IActionResult AddProductToCart(AddItemRequest request)
         {
