@@ -1,0 +1,52 @@
+{
+  "products": [
+    {
+      "BCD": "1122",
+      "Description": "Product 1",
+      "Description2": "المنتج 1",
+      "Price": "20.00",
+      "Vat": "1.00",
+      "DiscountDesc": "50% off",
+      "DiscountAmount": "10.00",
+      "FinalPrice": "11.00",
+      "Weighted": false,
+      "AgeRestriction": true
+    },
+    {
+      "BCD": "112233",
+      "Description": "Product 2",
+      "Description2": "المنتج 2",
+      "Price": "40.00",
+      "Vat": "2.00",
+      "DiscountDesc": "50% off",
+      "DiscountAmount": "20.00",
+      "FinalPrice": "22.00",
+      "Weighted": false,
+      "AgeRestriction": true
+    },
+    {
+      "BCD": "11223344",
+      "Description": "Product 3 with long name",
+      "Description2": "المنتج 3 بالاسم الطويل",
+      "Price": "30.00",
+      "Vat": "1.50",
+      "DiscountDesc": "40% off",
+      "DiscountAmount": "12.00",
+      "FinalPrice": "19.5",
+      "Weighted": false,
+      "AgeRestriction": false
+    },
+    {
+      "BCD": "1122334455",
+      "Description": "Product 4, 0% discount",
+      "Description2": "المنتج 4، خصم 0%",
+      "Price": "89.00",
+      "Vat": "4.45",
+      "DiscountDesc": "",
+      "DiscountAmount": "0.00",
+      "FinalPrice": "93.45",
+      "Weighted": true,
+      "AgeRestriction": false
+    }
+  ]
+}
