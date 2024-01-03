@@ -26,7 +26,7 @@ namespace POS_API_IDOL.Controllers
         /// <param name="logger"></param>
         public PosApiController(ILogger<PosApiController> logger)
         {
-                _logger = logger;
+            _logger = logger;
         }
 
 
@@ -89,7 +89,7 @@ namespace POS_API_IDOL.Controllers
                     return BadRequest(err);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 err = new Error()
                 {
@@ -203,7 +203,7 @@ namespace POS_API_IDOL.Controllers
                     {
                         Code = 403,
                         Message = "Unkown product has scanned.",
-                        Details = "Unkown product has scanned  -  "+ request.BarCode
+                        Details = "Unkown product has scanned  -  " + request.BarCode
                     };
                     _logger.LogError("Unkown product has scanned  -  " + request.BarCode);
                     return NotFound(err);
@@ -248,13 +248,13 @@ namespace POS_API_IDOL.Controllers
                 if (request != null && !string.IsNullOrEmpty(request.TerminalNo)
                     && !string.IsNullOrEmpty(request.StoreNo) && !string.IsNullOrEmpty(request.BarCode))
                 {
-                    if(request.TransactionId != TransactionId)
+                    if (request.TransactionId != TransactionId)
                     {
                         err = new Error()
                         {
                             Code = 403,
                             Message = "Unkown transaction",
-                            Details = "Unkown transaction  -  "+ request.TerminalNo +"  -  " + request.BarCode
+                            Details = "Unkown transaction  -  " + request.TerminalNo + "  -  " + request.BarCode
                         };
                         _logger.LogError("Unkown transaction  -  " + request.TerminalNo + "  -  " + request.BarCode);
                         return Unauthorized(err);
@@ -267,13 +267,13 @@ namespace POS_API_IDOL.Controllers
                         List<ProductDetail> productDetails = new List<ProductDetail>();
                         TransactionTotal total = new TransactionTotal();
 
-                        if(cartProducts != null && cartProducts.Products.Count > 0)
+                        if (cartProducts != null && cartProducts.Products.Count > 0)
                         {
                             productDetails.AddRange(cartProducts.Products);
                             total = cartProducts.Total;
                         }
-                           
-                        if(productDetails.Where(x=>x.BCD == product.BCD).Any())
+
+                        if (productDetails.Where(x => x.BCD == product.BCD).Any())
                         {
                             qty = productDetails.Where(x => x.BCD == product.BCD).Select(x => x.Qty).FirstOrDefault();
                             productDetails.Remove(productDetails.Where(x => x.BCD == product.BCD).FirstOrDefault());
@@ -297,7 +297,7 @@ namespace POS_API_IDOL.Controllers
                         {
                             TotalAmount = total.TotalAmount + product.FinalPrice,
                             TotalDiscount = total.TotalDiscount + product.DiscountAmount,
-                            TotalItems = total.TotalItems +  1,
+                            TotalItems = total.TotalItems + 1,
                             TotalVat = total.TotalVat + product.Vat,
                             TransactionId = request.TransactionId
                         };
@@ -414,7 +414,7 @@ namespace POS_API_IDOL.Controllers
                         PaymentCompleted = true
                     });
                 }
-                else 
+                else
                 {
                     err = new Error()
                     {
@@ -515,7 +515,7 @@ namespace POS_API_IDOL.Controllers
                     };
                     return Ok(payment);
                 }
-                else 
+                else
                 {
                     err = new Error()
                     {
@@ -554,7 +554,7 @@ namespace POS_API_IDOL.Controllers
             {
                 if (request != null && !string.IsNullOrEmpty(request.StoreNo) && !string.IsNullOrEmpty(request.TerminalNo))
                 {
-                    if(lastCartProducts == null || lastCartProducts.Products.Count() == 0)
+                    if (lastCartProducts == null || lastCartProducts.Products.Count() == 0)
                     {
                         err = new Error()
                         {
@@ -659,7 +659,7 @@ namespace POS_API_IDOL.Controllers
             }
             catch (Exception ex)
             {
-                err = new Error() 
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
