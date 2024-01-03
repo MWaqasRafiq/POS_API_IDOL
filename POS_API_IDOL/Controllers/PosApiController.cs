@@ -18,10 +18,17 @@ namespace POS_API_IDOL.Controllers
         private static string? TransactionId;
         private static string Currency = "AED";
         public static CartProducts cartProducts;
+        public static CartProducts lastCartProducts;
+
+        /// <summary>
+        /// Initialize constructor
+        /// </summary>
+        /// <param name="logger"></param>
         public PosApiController(ILogger<PosApiController> logger)
         {
                 _logger = logger;
         }
+
 
         /// <summary>
         /// API will be called when the application get started to check if the terminal should be open
@@ -31,6 +38,7 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("SignTerminal")]
         public IActionResult SignTerminal(SignTerminalRequest request)
         {
+            var err = new Error();
             try
             {
                 if (request != null && !string.IsNullOrEmpty(request.Type))
@@ -57,34 +65,33 @@ namespace POS_API_IDOL.Controllers
                     }
                     else
                     {
-                        _logger.LogWarning("Unknown request type has found. SignTerminal > SignTerminalRequest");
-                        var err = new Error()
+                        err = new Error()
                         {
                             Code = 403,
                             Message = "Unknown request type has found.",
                             Details = "Unknown request type has found. SignTerminal > SignTerminalRequest"
                         };
+                        _logger.LogError("Unknown request type has found. SignTerminal > SignTerminalRequest");
                         return BadRequest(err);
                     }
 
-                    _logger.LogInformation("SignTerminal > SignTerminalRequest OK");
                     return Ok(genericResponse);
                 }
                 else
                 {
-                    _logger.LogWarning("SignTerminal > SignTerminalRequest is null");
-                    var err = new Error()
+                    err = new Error()
                     {
-                        Code = 403,
+                        Code = 404,
                         Message = "No data has found.",
                         Details = "No data has found. SignTerminal > SignTerminalRequest is null"
                     };
+                    _logger.LogError("No data has found. SignTerminal > SignTerminalRequest is null");
                     return BadRequest(err);
                 }
             }
             catch(Exception ex)
             {
-                var err = new Error()
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -95,6 +102,7 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
+
         /// <summary>
         /// When customer choose to start a new transaction for checkout
         /// </summary>
@@ -103,18 +111,20 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("StartTransaction")]
         public IActionResult StartTransaction(StartTransactionRequest request)
         {
+            var err = new Error();
             try
             {
                 if (request != null && !string.IsNullOrEmpty(request.TerminalNo) && !string.IsNullOrEmpty(request.StoreNo))
                 {
                     if (!string.IsNullOrEmpty(TransactionId))
                     {
-                        var err = new Error()
+                        err = new Error()
                         {
                             Code = 400,
                             Message = "Close transaction to start new.",
                             Details = "Close transaction to start new. StartTransaction > StartTransactionRequest"
                         };
+                        _logger.LogError("Close transaction to start new. StartTransaction > StartTransactionRequest");
                         return BadRequest(err);
                     }
                     TransactionId = Create16DigitString();
@@ -131,18 +141,19 @@ namespace POS_API_IDOL.Controllers
                 }
                 else
                 {
-                    var err = new Error()
+                    err = new Error()
                     {
-                        Code = 403,
+                        Code = 404,
                         Message = "No data has found.",
                         Details = "No data has found. StartTransaction > StartTransactionRequest is null"
                     };
+                    _logger.LogError("No data has found. StartTransaction > StartTransactionRequest is null");
                     return BadRequest(err);
                 }
             }
             catch (Exception ex)
             {
-                var err = new Error()
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -153,6 +164,7 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
+
         /// <summary>
         /// When customer scan an item this API will check the product details
         /// </summary>
@@ -161,6 +173,7 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("ProductDetails")]
         public IActionResult CheckProductDetails(CheckProductRequest request)
         {
+            var err = new Error();
             try
             {
                 if (request != null && !string.IsNullOrEmpty(request.TerminalNo)
@@ -186,17 +199,30 @@ namespace POS_API_IDOL.Controllers
 
                         return Ok(response);
                     }
-
-                    return NotFound();
+                    err = new Error()
+                    {
+                        Code = 403,
+                        Message = "Unkown product has scanned.",
+                        Details = "Unkown product has scanned  -  "+ request.BarCode
+                    };
+                    _logger.LogError("Unkown product has scanned  -  " + request.BarCode);
+                    return NotFound(err);
                 }
                 else
                 {
-                    return BadRequest();
+                    err = new Error()
+                    {
+                        Code = 404,
+                        Message = "No data has found.",
+                        Details = "No data has found. ProductDetails > CheckProductRequest"
+                    };
+                    _logger.LogError("No data has found. ProductDetails > CheckProductRequest");
+                    return BadRequest(err);
                 }
             }
             catch (Exception ex)
             {
-                var err = new Error()
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -207,6 +233,7 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
+
         /// <summary>
         /// When customer scan an item and the product exists, this API will update the transaction
         /// </summary>
@@ -215,6 +242,7 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("AddToCart")]
         public IActionResult AddProductToCart(AddItemRequest request)
         {
+            var err = new Error();
             try
             {
                 if (request != null && !string.IsNullOrEmpty(request.TerminalNo)
@@ -222,7 +250,14 @@ namespace POS_API_IDOL.Controllers
                 {
                     if(request.TransactionId != TransactionId)
                     {
-                        return Unauthorized();
+                        err = new Error()
+                        {
+                            Code = 403,
+                            Message = "Unkown transaction",
+                            Details = "Unkown transaction  -  "+ request.TerminalNo +"  -  " + request.BarCode
+                        };
+                        _logger.LogError("Unkown transaction  -  " + request.TerminalNo + "  -  " + request.BarCode);
+                        return Unauthorized(err);
                     }
                     ProductsDetails products = ProductList();
                     var product = products.products.Where(x => x.BCD == request.BarCode).FirstOrDefault();
@@ -273,17 +308,30 @@ namespace POS_API_IDOL.Controllers
                         };
                         return Ok(cartProducts);
                     }
-
-                    return NotFound();
+                    err = new Error()
+                    {
+                        Code = 404,
+                        Message = "No data has found.",
+                        Details = "No data has found. AddProductToCart > AddItemRequest"
+                    };
+                    _logger.LogError("No data has found. AddProductToCart > AddItemRequest");
+                    return BadRequest(err);
                 }
                 else
                 {
-                    return BadRequest();
+                    err = new Error()
+                    {
+                        Code = 404,
+                        Message = "No data has found.",
+                        Details = "No data has found. AddProductToCart > AddItemRequest"
+                    };
+                    _logger.LogError("No data has found. AddProductToCart > AddItemRequest");
+                    return BadRequest(err);
                 }
             }
             catch (Exception ex)
             {
-                var err = new Error()
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -293,6 +341,7 @@ namespace POS_API_IDOL.Controllers
                 return BadRequest(err);
             }
         }
+
 
         /// <summary>
         /// when we need to get the total of transaction or we need to update the receipt
@@ -302,16 +351,26 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("OrderTotal")]
         public IActionResult OrderTotal(StartTransactionRequest request)
         {
+            var err = new Error();
             try
             {
-                if (request != null && !string.IsNullOrEmpty(request.TerminalNo))
+                if (request != null && !string.IsNullOrEmpty(request.TerminalNo) && !string.IsNullOrEmpty(request.StoreNo))
                     return Ok(cartProducts);
                 else
-                    return BadRequest();
+                {
+                    err = new Error()
+                    {
+                        Code = 403,
+                        Message = "Unkown request",
+                        Details = "Unkown request. OrderTotal > StartTransactionRequest "
+                    };
+                    _logger.LogError("Unkown request. OrderTotal > StartTransactionRequest ");
+                    return BadRequest(err);
+                }
             }
             catch (Exception ex)
             {
-                var err = new Error()
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -321,6 +380,7 @@ namespace POS_API_IDOL.Controllers
                 return BadRequest(err);
             }
         }
+
 
         /// <summary>
         /// When SCO processed the payment with bank this request will log the payment info to POS
@@ -330,13 +390,21 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("AddPayment")]
         public IActionResult AddPayment(AddPaymentRequest request)
         {
+            var err = new Error();
             try
             {
                 if (request != null && !string.IsNullOrEmpty(request.TransactionId) && request.Amount > 0)
                 {
                     if (request.TransactionId != TransactionId)
                     {
-                        return Unauthorized();
+                        err = new Error()
+                        {
+                            Code = 403,
+                            Message = "Unkown transaction",
+                            Details = "Unkown transaction  -  " + request.TerminalNo
+                        };
+                        _logger.LogError("Unkown transaction  -  " + request.TerminalNo);
+                        return Unauthorized(err);
                     }
                     return Ok(new GenericResponse()
                     {
@@ -345,12 +413,21 @@ namespace POS_API_IDOL.Controllers
                         StatusMessage = "Transaction completed successfully"
                     });
                 }
-                else
-                    return BadRequest();
+                else 
+                {
+                    err = new Error()
+                    {
+                        Code = 404,
+                        Message = "No data has found.",
+                        Details = "No data has found. AddPayment > AddPaymentRequest"
+                    };
+                    _logger.LogError("No data has found. AddPayment > AddPaymentRequest");
+                    return BadRequest(err);
+                }
             }
             catch (Exception ex)
             {
-                var err = new Error()
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -361,6 +438,7 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
+
         /// <summary>
         /// when the user has completed the payment and bank has responded positive this method will send the receipt for print
         /// </summary>
@@ -369,20 +447,28 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("PrintReceipt")]
         public IActionResult PrintReceipt(PrintReceiptRequest request)
         {
+            var err = new Error();
             try
             {
                 if (request != null && !string.IsNullOrEmpty(request.TransactionId))
                 {
                     if (request.TransactionId != TransactionId)
                     {
-                        return Unauthorized();
+                        err = new Error()
+                        {
+                            Code = 403,
+                            Message = "Unkown transaction",
+                            Details = "Unkown transaction  -  " + request.TerminalNo
+                        };
+                        _logger.LogError("Unkown transaction  -  " + request.TerminalNo);
+                        return Unauthorized(err);
                     }
                     string products = string.Empty;
 
                     foreach (var item in cartProducts.Products)
                     {
                         products += item.Qty.ToString() + "x " + item.Description + "\t" + Currency
-                                + " "+ item.FinalPrice.ToString("0.00")+" \r\n";
+                                + " " + item.FinalPrice.ToString("0.00") + " \r\n";
                         if (!string.IsNullOrEmpty(item.Description2))
                         {
                             products += "   " + item.Description2 + " \r\n";
@@ -394,8 +480,8 @@ namespace POS_API_IDOL.Controllers
                                         "\t  IDOL Store \r\n" +
                                         "$$PRINTLOGOxx \r\n" +
                                         "---------------------------------\r\n" +
-                                        "Transaction No:\t " + TransactionId  +
-                                        "\r\n Date: \t " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + 
+                                        "Transaction No:\t " + TransactionId +
+                                        "\r\n Date: \t " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") +
                                         "\r\n $$PRINTBCD(code128)(4235432354543)" +
                                         "\r\n\r\n $$CUTPAPER";
 
@@ -409,7 +495,7 @@ namespace POS_API_IDOL.Controllers
                                     "Transaction No:\t " + TransactionId + "\r\n" +
                                     "Date: \t " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n" +
                                     "---------------------------------\r\n" +
-                                    "" + products + 
+                                    "" + products +
                                     "---------------------------------\r\n" +
                                     "VAT 5% \t\t " + cartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n" +
                                     "Total \t\t " + cartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
@@ -428,12 +514,21 @@ namespace POS_API_IDOL.Controllers
                     };
                     return Ok(payment);
                 }
-                else
-                    return BadRequest();
+                else 
+                {
+                    err = new Error()
+                    {
+                        Code = 404,
+                        Message = "No data has found.",
+                        Details = "No data has found. PrintReceipt > PrintReceiptRequest"
+                    };
+                    _logger.LogError("No data has found. PrintReceipt > PrintReceiptRequest");
+                    return BadRequest(err);
+                }
             }
             catch (Exception ex)
             {
-                var err = new Error()
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -444,25 +539,75 @@ namespace POS_API_IDOL.Controllers
             }
         }
 
+
         /// <summary>
-        /// Close the transaction to start a new one
+        /// To print last transactional receipt
         /// </summary>
+        /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("CloseTransaction")]
-        public IActionResult CloseTransaction()
+        [HttpPost("PrintLastReceipt")]
+        public IActionResult PrintLastReceipt(StartTransactionRequest request)
         {
+            var err = new Error();
             try
             {
-                if (string.IsNullOrEmpty(TransactionId))
+                if (request != null && !string.IsNullOrEmpty(request.StoreNo) && !string.IsNullOrEmpty(request.TerminalNo))
                 {
-                    return BadRequest("Transaction is already closed.");
+                    string products = string.Empty;
+
+                    foreach (var item in lastCartProducts.Products)
+                    {
+                        products += item.Qty.ToString() + "x " + item.Description + "\t" + Currency
+                                + " " + item.FinalPrice.ToString("0.00") + " \r\n";
+                        if (!string.IsNullOrEmpty(item.Description2))
+                        {
+                            products += "   " + item.Description2 + " \r\n";
+                        }
+                    }
+
+                    string receipt = "========================\r\n" +
+                                    "\t  IDOL Store \r\n" +
+                                    "$$PRINTLOGOxx \r\n" +
+                                    "========================\r\n" +
+                                    "\t full of goodness\r\n" +
+                                    "---------------------------------\r\n" +
+                                    "Transaction No:\t " + lastCartProducts.Total.TransactionId + "\r\n" +
+                                    "Date: \t " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n" +
+                                    "---------------------------------\r\n" +
+                                    "" + products +
+                                    "---------------------------------\r\n" +
+                                    "VAT 5% \t\t " + lastCartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n" +
+                                    "Total \t\t " + lastCartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
+                                    "\r\n\r\n $$PRINTBCD(code128)(342354432354)" +
+                                    "\r\n\r\n $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
+                                    "\r\n\r\n $$PRINTBCD(code128)(4235432354543)" +
+                                    "\r\n\r\n $$CUTPAPER";
+
+                    var payment = new PrintReceiptResponse()
+                    {
+                        Amount = lastCartProducts.Total.TotalAmount,
+                        Currency = Currency,
+                        DiscountAmount = lastCartProducts.Total.TotalDiscount,
+                        Vat = lastCartProducts.Total.TotalVat,
+                        Receipt = receipt
+                    };
+                    return Ok(payment);
                 }
-                TransactionId = string.Empty;
-                return Ok("Transaction has closed.");
+                else
+                {
+                    err = new Error()
+                    {
+                        Code = 404,
+                        Message = "No data has found.",
+                        Details = "No data has found. PrintLastReceipt > PrintReceiptRequest"
+                    };
+                    _logger.LogError("No data has found. PrintLastReceipt > PrintReceiptRequest");
+                    return BadRequest(err);
+                }
             }
             catch (Exception ex)
             {
-                var err = new Error() 
+                err = new Error()
                 {
                     Code = 500,
                     Message = "The server has thrown an exception.",
@@ -472,6 +617,47 @@ namespace POS_API_IDOL.Controllers
                 return BadRequest(err);
             }
         }
+
+
+        /// <summary>
+        /// Close the transaction to start a new one
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("CloseTransaction")]
+        public IActionResult CloseTransaction()
+        {
+            var err = new Error();
+            try
+            {
+                if (string.IsNullOrEmpty(TransactionId))
+                {
+                    err = new Error()
+                    {
+                        Code = 400,
+                        Message = "Transaction is already closed.",
+                        Details = "Transaction is already closed. CloseTransaction"
+                    };
+                    _logger.LogError("Transaction is already closed. CloseTransaction");
+                    return BadRequest(err);
+                }
+                TransactionId = string.Empty;
+                lastCartProducts = cartProducts;
+                cartProducts = new CartProducts();
+                return Ok("Transaction has closed.");
+            }
+            catch (Exception ex)
+            {
+                err = new Error() 
+                {
+                    Code = 500,
+                    Message = "The server has thrown an exception.",
+                    Details = ex.Message
+                };
+                _logger.LogError(ex.Message);
+                return BadRequest(err);
+            }
+        }
+
 
         #region private methods
         private string Create16DigitString()
@@ -483,7 +669,6 @@ namespace POS_API_IDOL.Controllers
             }
             return builder.ToString();
         }
-
         private ProductsDetails ProductList()
         {
             try
