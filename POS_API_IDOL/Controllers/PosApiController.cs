@@ -349,7 +349,7 @@ namespace POS_API_IDOL.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OrderTotal")]
-        public IActionResult OrderTotal(StartTransactionRequest request)
+        public IActionResult OrderTotal(OrderTotalRequest request)
         {
             var err = new Error();
             try
@@ -406,11 +406,12 @@ namespace POS_API_IDOL.Controllers
                         _logger.LogError("Unkown transaction  -  " + request.TerminalNo);
                         return Unauthorized(err);
                     }
-                    return Ok(new GenericResponse()
+                    return Ok(new AddPaymentResponse()
                     {
                         Code = 1,
                         Status = "true",
-                        StatusMessage = "Transaction completed successfully"
+                        StatusMessage = "Transaction completed successfully",
+                        PaymentCompleted = true
                     });
                 }
                 else 
@@ -467,42 +468,42 @@ namespace POS_API_IDOL.Controllers
 
                     foreach (var item in cartProducts.Products)
                     {
-                        products += item.Qty.ToString() + "x " + item.Description + "\t" + Currency
-                                + " " + item.FinalPrice.ToString("0.00") + " \r\n";
+                        products += item.Qty.ToString() + "x " + item.Description + "\t " + Currency
+                                + " " + item.FinalPrice.ToString("0.00") + " \r\n ";
                         if (!string.IsNullOrEmpty(item.Description2))
                         {
-                            products += "   " + item.Description2 + " \r\n";
+                            products += "   " + item.Description2 + " \r\n ";
                         }
                     }
 
                     //this can be empty string depending the store needs
-                    string greenReceipt = "========================\r\n" +
-                                        "\t  IDOL Store \r\n" +
-                                        "$$PRINTLOGOxx \r\n" +
-                                        "---------------------------------\r\n" +
-                                        "Transaction No:\t " + TransactionId +
-                                        "\r\n Date: \t " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") +
-                                        "\r\n $$PRINTBCD(code128)(4235432354543)" +
-                                        "\r\n\r\n $$CUTPAPER";
+                    string greenReceipt = "========================\r\n " +
+                                        "\t   IDOL Store \r\n " +
+                                        "$$PRINTLOGOxx \r\n " +
+                                        "---------------------------------\r\n " +
+                                        "Transaction No:\t  " + TransactionId +
+                                        "\r\n  Date: \t  " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") +
+                                        "\r\n  $$PRINTBCD(code128)(4235432354543)" +
+                                        "\r\n \r\n  $$CUTPAPER";
 
 
-                    string receipt = "========================\r\n" +
-                                    "\t  IDOL Store \r\n" +
-                                    "$$PRINTLOGOxx \r\n" +
-                                    "========================\r\n" +
-                                    "\t full of goodness\r\n" +
-                                    "---------------------------------\r\n" +
-                                    "Transaction No:\t " + TransactionId + "\r\n" +
-                                    "Date: \t " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n" +
-                                    "---------------------------------\r\n" +
+                    string receipt = "========================\r\n " +
+                                    "\t   IDOL Store \r\n " +
+                                    "$$PRINTLOGOxx \r\n " +
+                                    "========================\r\n " +
+                                    "\t  full of goodness\r\n " +
+                                    "---------------------------------\r\n " +
+                                    "Transaction No:\t  " + TransactionId + "\r\n " +
+                                    "Date: \t  " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n " +
+                                    "---------------------------------\r\n " +
                                     "" + products +
-                                    "---------------------------------\r\n" +
-                                    "VAT 5% \t\t " + cartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n" +
-                                    "Total \t\t " + cartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
-                                    "\r\n\r\n $$PRINTBCD(code128)(342354432354)" +
-                                    "\r\n\r\n $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
-                                    "\r\n\r\n $$PRINTBCD(code128)(4235432354543)" +
-                                    "\r\n\r\n $$CUTPAPER";
+                                    "---------------------------------\r\n " +
+                                    "VAT 5% \t \t  " + cartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n " +
+                                    "Total \t \t  " + cartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
+                                    "\r\n \r\n  $$PRINTBCD(code128)(342354432354)" +
+                                    "\r\n \r\n  $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
+                                    "\r\n \r\n  $$PRINTBCD(code128)(4235432354543)" +
+                                    "\r\n \r\n  $$CUTPAPER";
 
                     var payment = new PrintReceiptResponse()
                     {
@@ -546,42 +547,53 @@ namespace POS_API_IDOL.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("PrintLastReceipt")]
-        public IActionResult PrintLastReceipt(StartTransactionRequest request)
+        public IActionResult PrintLastReceipt(PrintLastReceiptRequest request)
         {
             var err = new Error();
             try
             {
                 if (request != null && !string.IsNullOrEmpty(request.StoreNo) && !string.IsNullOrEmpty(request.TerminalNo))
                 {
+                    if(lastCartProducts == null || lastCartProducts.Products.Count() == 0)
+                    {
+                        err = new Error()
+                        {
+                            Code = 404,
+                            Message = "No data has found.",
+                            Details = "No data has found. PrintLastReceipt > PrintReceiptRequest > lastCartProducts"
+                        };
+                        _logger.LogError("No data has found. PrintLastReceipt > PrintReceiptRequest > lastCartProducts");
+                        return BadRequest(err);
+                    }
                     string products = string.Empty;
 
                     foreach (var item in lastCartProducts.Products)
                     {
-                        products += item.Qty.ToString() + "x " + item.Description + "\t" + Currency
-                                + " " + item.FinalPrice.ToString("0.00") + " \r\n";
+                        products += item.Qty.ToString() + "x " + item.Description + "\t " + Currency
+                                + " " + item.FinalPrice.ToString("0.00") + " \r\n ";
                         if (!string.IsNullOrEmpty(item.Description2))
                         {
-                            products += "   " + item.Description2 + " \r\n";
+                            products += "   " + item.Description2 + " \r\n ";
                         }
                     }
 
-                    string receipt = "========================\r\n" +
-                                    "\t  IDOL Store \r\n" +
-                                    "$$PRINTLOGOxx \r\n" +
-                                    "========================\r\n" +
-                                    "\t full of goodness\r\n" +
-                                    "---------------------------------\r\n" +
-                                    "Transaction No:\t " + lastCartProducts.Total.TransactionId + "\r\n" +
-                                    "Date: \t " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n" +
-                                    "---------------------------------\r\n" +
+                    string receipt = "========================\r\n " +
+                                    "\t   IDOL Store \r\n " +
+                                    "$$PRINTLOGOxx \r\n " +
+                                    "========================\r\n " +
+                                    "\t  full of goodness\r\n " +
+                                    "---------------------------------\r\n " +
+                                    "Transaction No:\t  " + lastCartProducts.Total.TransactionId + "\r\n " +
+                                    "Date: \t  " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n " +
+                                    "---------------------------------\r\n " +
                                     "" + products +
-                                    "---------------------------------\r\n" +
-                                    "VAT 5% \t\t " + lastCartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n" +
-                                    "Total \t\t " + lastCartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
-                                    "\r\n\r\n $$PRINTBCD(code128)(342354432354)" +
-                                    "\r\n\r\n $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
-                                    "\r\n\r\n $$PRINTBCD(code128)(4235432354543)" +
-                                    "\r\n\r\n $$CUTPAPER";
+                                    "---------------------------------\r\n " +
+                                    "VAT 5% \t \t  " + lastCartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n " +
+                                    "Total \t \t  " + lastCartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
+                                    "\r\n \r\n  $$PRINTBCD(code128)(342354432354)" +
+                                    "\r\n \r\n  $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
+                                    "\r\n \r\n  $$PRINTBCD(code128)(4235432354543)" +
+                                    "\r\n \r\n  $$CUTPAPER";
 
                     var payment = new PrintReceiptResponse()
                     {

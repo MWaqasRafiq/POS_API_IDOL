@@ -4,6 +4,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Title>IDOL - POS API</Title>
+    <Authors>IDOL Technologies</Authors>
+    <Version>1.0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
