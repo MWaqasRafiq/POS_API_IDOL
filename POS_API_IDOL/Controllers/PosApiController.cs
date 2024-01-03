@@ -632,7 +632,7 @@ namespace POS_API_IDOL.Controllers
 
 
         /// <summary>
-        /// Close the transaction to start a new one
+        /// Close the current transaction before starting a new transaction
         /// </summary>
         /// <returns></returns>
         [HttpPost("CloseTransaction")]
