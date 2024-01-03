@@ -109,7 +109,13 @@ namespace POS_API_IDOL.Controllers
                 {
                     if (!string.IsNullOrEmpty(TransactionId))
                     {
-                        return BadRequest("Close transaction to start new.");
+                        var err = new Error()
+                        {
+                            Code = 400,
+                            Message = "Close transaction to start new.",
+                            Details = "Close transaction to start new. StartTransaction > StartTransactionRequest"
+                        };
+                        return BadRequest(err);
                     }
                     TransactionId = Create16DigitString();
                     cartProducts = new CartProducts();
