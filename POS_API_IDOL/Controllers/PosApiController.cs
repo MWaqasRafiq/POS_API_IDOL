@@ -465,45 +465,50 @@ namespace POS_API_IDOL.Controllers
                         return Unauthorized(err);
                     }
                     string products = string.Empty;
+                    string receipt = string.Empty;
 
-                    foreach (var item in cartProducts.Products)
+                    if (request.GoGreen == true)
                     {
-                        products += item.Qty.ToString() + "x " + item.Description + "\t " + Currency
-                                + " " + item.FinalPrice.ToString("0.00") + " \r\n ";
-                        if (!string.IsNullOrEmpty(item.Description2))
-                        {
-                            products += "   " + item.Description2 + " \r\n ";
-                        }
+                        //this can be empty string depending the store needs
+                        receipt = "========================\r\n " +
+                        "\t   IDOL Store \r\n " +
+                        "$$PRINTLOGOxx \r\n " +
+                        "---------------------------------\r\n " +
+                        "Transaction No:\t  " + TransactionId +
+                        "\r\n  Date: \t  " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") +
+                        "\r\n  $$PRINTBCD(code128)(4235432354543)" +
+                        "\r\n \r\n  $$CUTPAPER";
                     }
+                    else
+                    {
+                        foreach (var item in cartProducts.Products)
+                        {
+                            products += item.Qty.ToString() + "x " + item.Description + "\t " + Currency
+                                    + " " + item.FinalPrice.ToString("0.00") + " \r\n ";
+                            if (!string.IsNullOrEmpty(item.Description2))
+                            {
+                                products += "   " + item.Description2 + " \r\n ";
+                            }
+                        }
 
-                    //this can be empty string depending the store needs
-                    string greenReceipt = "========================\r\n " +
-                                        "\t   IDOL Store \r\n " +
-                                        "$$PRINTLOGOxx \r\n " +
-                                        "---------------------------------\r\n " +
-                                        "Transaction No:\t  " + TransactionId +
-                                        "\r\n  Date: \t  " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") +
-                                        "\r\n  $$PRINTBCD(code128)(4235432354543)" +
-                                        "\r\n \r\n  $$CUTPAPER";
-
-
-                    string receipt = "========================\r\n " +
-                                    "\t   IDOL Store \r\n " +
-                                    "$$PRINTLOGOxx \r\n " +
-                                    "========================\r\n " +
-                                    "\t  full of goodness\r\n " +
-                                    "---------------------------------\r\n " +
-                                    "Transaction No:\t  " + TransactionId + "\r\n " +
-                                    "Date: \t  " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n " +
-                                    "---------------------------------\r\n " +
-                                    "" + products +
-                                    "---------------------------------\r\n " +
-                                    "VAT 5% \t \t  " + cartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n " +
-                                    "Total \t \t  " + cartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
-                                    "\r\n \r\n  $$PRINTBCD(code128)(342354432354)" +
-                                    "\r\n \r\n  $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
-                                    "\r\n \r\n  $$PRINTBCD(code128)(4235432354543)" +
-                                    "\r\n \r\n  $$CUTPAPER";
+                        receipt = "========================\r\n " +
+                        "\t   IDOL Store \r\n " +
+                        "$$PRINTLOGOxx \r\n " +
+                        "========================\r\n " +
+                        "\t  full of goodness\r\n " +
+                        "---------------------------------\r\n " +
+                        "Transaction No:\t  " + TransactionId + "\r\n " +
+                        "Date: \t  " + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + " \r\n " +
+                        "---------------------------------\r\n " +
+                        "" + products +
+                        "---------------------------------\r\n " +
+                        "VAT 5% \t \t  " + cartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n " +
+                        "Total \t \t  " + cartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
+                        "\r\n \r\n  $$PRINTBCD(code128)(342354432354)" +
+                        "\r\n \r\n  $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
+                        "\r\n \r\n  $$PRINTBCD(code128)(4235432354543)" +
+                        "\r\n \r\n  $$CUTPAPER";
+                    }
 
                     var payment = new PrintReceiptResponse()
                     {
@@ -511,7 +516,7 @@ namespace POS_API_IDOL.Controllers
                         Currency = Currency,
                         DiscountAmount = cartProducts.Total.TotalDiscount,
                         Vat = cartProducts.Total.TotalVat,
-                        Receipt = request.GoGreen == true ? greenReceipt : receipt
+                        Receipt = receipt
                     };
                     return Ok(payment);
                 }
