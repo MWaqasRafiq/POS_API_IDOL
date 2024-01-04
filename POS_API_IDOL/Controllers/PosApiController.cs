@@ -118,14 +118,9 @@ namespace POS_API_IDOL.Controllers
                 {
                     if (!string.IsNullOrEmpty(TransactionId))
                     {
-                        err = new Error()
-                        {
-                            Code = 400,
-                            Message = "Close transaction to start new.",
-                            Details = "Close transaction to start new. StartTransaction > StartTransactionRequest"
-                        };
-                        _logger.LogError("Close transaction to start new. StartTransaction > StartTransactionRequest");
-                        return BadRequest(err);
+                        TransactionId = string.Empty;
+                        lastCartProducts = cartProducts;
+                        cartProducts = new CartProducts();
                     }
                     TransactionId = Create16DigitString();
                     cartProducts = new CartProducts();
@@ -493,7 +488,7 @@ namespace POS_API_IDOL.Controllers
 
                         receipt = "========================\r\n " +
                         "\t   IDOL Store \r\n " +
-                        "$$PRINTLOGOxx \r\n " +
+                        "$$PRINTLOGO22 \r\n " +
                         "========================\r\n " +
                         "\t  full of goodness\r\n " +
                         "---------------------------------\r\n " +
@@ -504,9 +499,8 @@ namespace POS_API_IDOL.Controllers
                         "---------------------------------\r\n " +
                         "VAT 5% \t \t  " + cartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n " +
                         "Total \t \t  " + cartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
-                        "\r\n \r\n  $$PRINTBCD(code128)(342354432354)" +
-                        "\r\n \r\n  $$PRINTQR(“MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=”)" +
-                        "\r\n \r\n  $$PRINTBCD(code128)(4235432354543)" +
+                        "\r\n \r\n  $$PRINTBCD(128)(342354432354)" +
+                        "\r\n \r\n  $$PRINTQR(MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=)" +
                         "\r\n \r\n  $$CUTPAPER";
                     }
 
