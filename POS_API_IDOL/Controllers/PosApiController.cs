@@ -499,7 +499,7 @@ namespace POS_API_IDOL.Controllers
                         "---------------------------------\r\n " +
                         "VAT 5% \t \t  " + cartProducts.Total.TotalVat.ToString("0.00") + " " + Currency + "\r\n " +
                         "Total \t \t  " + cartProducts.Total.TotalAmount.ToString("0.00") + " " + Currency + " " +
-                        "\r\n \r\n  $$PRINTBCD(128)(342354432354)" +
+                        "\r\n \r\n  $$PRINTBCD(128)(8965412356231)" +
                         "\r\n \r\n  $$PRINTQR(MEUCIQCB5EuGlXvw1LlpOGc0M1BmI+BTcpwYhcQKnzg5kXip5AIgR/ybsA7HGNwxJ+QSborSVxL3bM4dXXNqEgFx=)" +
                         "\r\n \r\n  $$CUTPAPER";
                     }
