@@ -50,7 +50,7 @@
     },
     {
       "description": "NEW MINI BREAD",
-      "description2": "NEW MINI BREAD",
+      "description2": "خبز ميني جديد",
       "price": "10.00",
       "barCode": "8965412356237",
       "vat": "0.50",
@@ -62,7 +62,7 @@
     },
     {
       "description": "NEW MINI VIENESE",
-      "description2": "NEW MINI VIENESE",
+      "description2": "سيارة ميني فيينا الجديدة",
       "price": "20.00",
       "barCode": "8965412356238",
       "vat": "1.00",
@@ -74,7 +74,7 @@
     },
     {
       "description": "NEW MUFFINS ASSORTED",
-      "description2": "NEW MUFFINS ASSORTED",
+      "description2": "فطائر جديدة متنوعة",
       "price": "30.00",
       "barCode": "8965412356239",
       "vat": "1.50",
@@ -86,7 +86,7 @@
     },
     {
       "description": "HERBS 1",
-      "description2": "HERBS 1",
+      "description2": "الأعشاب 1",
       "price": "10.00",
       "barCode": "8965412356240",
       "vat": "0.50",
@@ -98,7 +98,7 @@
     },
     {
       "description": "NEW HERBS 2",
-      "description2": "NEW HERBS 2",
+      "description2": "أعشاب جديدة 2",
       "price": "20.00",
       "barCode": "8965412356241",
       "vat": "1.00",
@@ -110,7 +110,7 @@
     },
     {
       "description": "HERBS 3",
-      "description2": "HERBS 3",
+      "description2": "الأعشاب 3",
       "price": "30.00",
       "barCode": "8965412356242",
       "vat": "1.50",
@@ -122,7 +122,7 @@
     },
     {
       "description": "DONATION 20",
-      "description2": "DONATION 20",
+      "description2": "التبرع 20",
       "price": "20.00",
       "barCode": "9880000000726",
       "vat": "1.00",
@@ -134,7 +134,7 @@
     },
     {
       "description": "DONATION 50",
-      "description2": "DONATION 50",
+      "description2": "التبرع 50",
       "price": "50.00",
       "barCode": "9880000000733",
       "vat": "2.50",
@@ -146,7 +146,7 @@
     },
     {
       "description": "DONATION 100",
-      "description2": "DONATION 100",
+      "description2": "التبرع 100",
       "price": "100.00",
       "barCode": "9880000000764",
       "vat": "5.00",
@@ -158,7 +158,7 @@
     },
     {
       "description": "DU 30",
-      "description2": "DU 30",
+      "description2": "دو 30",
       "price": "30.00",
       "barCode": "1166544800655",
       "vat": "1.50",
@@ -170,7 +170,7 @@
     },
     {
       "description": "DU 55",
-      "description2": "DU 55",
+      "description2": "دو 55",
       "price": "55.00",
       "barCode": "5561155400565",
       "vat": "2.75",
@@ -182,7 +182,7 @@
     },
     {
       "description": "DU 110",
-      "description2": "DU 110",
+      "description2": "دو 110",
       "price": "110.00",
       "barCode": "1115506444551",
       "vat": "5.50",
@@ -194,7 +194,7 @@
     },
     {
       "description": "DU 525",
-      "description2": "DU 525",
+      "description2": "دو 525",
       "price": "525.00",
       "barCode": "1220066554456",
       "vat": "26.25",
@@ -206,7 +206,7 @@
     },
     {
       "description": "ETISALAT 30",
-      "description2": "ETISALAT 30",
+      "description2": "اتصالات 30",
       "price": "30.00",
       "barCode": "1166444551908",
       "vat": "1.50",
@@ -218,7 +218,7 @@
     },
     {
       "description": "ETISALAT 55",
-      "description2": "ETISALAT 55",
+      "description2": "اتصالات 55",
       "price": "55.00",
       "barCode": "5699100006040",
       "vat": "2.75",
@@ -230,7 +230,7 @@
     },
     {
       "description": "ETISALAT 110",
-      "description2": "ETISALAT 110",
+      "description2": "اتصالات 110",
       "price": "110.00",
       "barCode": "5690020025418",
       "vat": "5.50",
@@ -242,7 +242,7 @@
     },
     {
       "description": "ETISALAT 525",
-      "description2": "ETISALAT 525",
+      "description2": "اتصالات 525",
       "price": "525.00",
       "barCode": "5699100005869",
       "vat": "26.25",
@@ -254,7 +254,7 @@
     },
     {
       "description": "VIRGIN 30",
-      "description2": "VIRGIN 30",
+      "description2": "بِكر 30",
       "price": "30.00",
       "barCode": "5699100006965",
       "vat": "1.50",
@@ -266,7 +266,7 @@
     },
     {
       "description": "VIRGIN 55",
-      "description2": "VIRGIN 55",
+      "description2": "بِكر 55",
       "price": "55.00",
       "barCode": "5699100006613",
       "vat": "2.75",
@@ -278,7 +278,7 @@
     },
     {
       "description": "VIRGIN 110",
-      "description2": "VIRGIN 110",
+      "description2": "بِكر 110",
       "price": "110.00",
       "barCode": "5699100006873",
       "vat": "5.50",
@@ -290,7 +290,7 @@
     },
     {
       "description": "VIRGIN 525",
-      "description2": "VIRGIN 525",
+      "description2": "بِكر 525",
       "price": "525.00",
       "barCode": "5699100006668",
       "vat": "26.25",

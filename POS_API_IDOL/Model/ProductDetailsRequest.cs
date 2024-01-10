@@ -1,6 +1,6 @@
 ﻿namespace POS_API_IDOL.Model
 {
-    public class CheckProductRequest
+    public class ProductDetailsRequest
     {
         public string StoreNo { get; set; }
         public string TerminalNo { get; set; }

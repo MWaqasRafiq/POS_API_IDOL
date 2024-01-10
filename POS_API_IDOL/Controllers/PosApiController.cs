@@ -37,17 +37,17 @@ namespace POS_API_IDOL.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("SignTerminal")]
-        [ProducesResponseType(typeof(GenericResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(SignTerminalResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
         public IActionResult SignTerminal(SignTerminalRequest request)
         {
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("SignTerminal Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.Type))
                 {
-                    GenericResponse genericResponse = new GenericResponse();
+                    SignTerminalResponse genericResponse = new SignTerminalResponse();
                     if (request.Type.ToLower() == "on")
                     {
                         genericResponse.Message = "Terminal signed on successfully";
@@ -112,7 +112,7 @@ namespace POS_API_IDOL.Controllers
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("StartTransaction Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.TerminalNo) && !string.IsNullOrEmpty(request.StoreNo))
                 {
                     if (!string.IsNullOrEmpty(TransactionId))
@@ -165,12 +165,12 @@ namespace POS_API_IDOL.Controllers
         [HttpPost("ProductDetails")]
         [ProducesResponseType(typeof(ProductDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
-        public IActionResult CheckProductDetails(CheckProductRequest request)
+        public IActionResult CheckProductDetails(ProductDetailsRequest request)
         {
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("ProductDetails Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.TerminalNo)
                     && !string.IsNullOrEmpty(request.StoreNo) && !string.IsNullOrEmpty(request.BarCode))
                 {
@@ -209,9 +209,9 @@ namespace POS_API_IDOL.Controllers
                     {
                         Code = 404,
                         Message = "No data has found.",
-                        Details = "No data has found. ProductDetails > CheckProductRequest"
+                        Details = "No data has found. ProductDetails > ProductDetailsRequest"
                     };
-                    _logger.LogError("No data has found. ProductDetails > CheckProductRequest");
+                    _logger.LogError("No data has found. ProductDetails > ProductDetailsRequest");
                     return BadRequest(err);
                 }
             }
@@ -243,7 +243,7 @@ namespace POS_API_IDOL.Controllers
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("AddToCart Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.TransactionId) && !string.IsNullOrEmpty(request.BarCode))
                 {
                     if (request.TransactionId != TransactionId)
@@ -304,6 +304,9 @@ namespace POS_API_IDOL.Controllers
                             Products = productDetails,
                             Total = total
                         };
+
+                        _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(cartProducts));
+                        
                         return Ok(cartProducts);
                     }
                     err = new Error()
@@ -355,7 +358,7 @@ namespace POS_API_IDOL.Controllers
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("VoidFromCart Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.TransactionId) && !string.IsNullOrEmpty(request.BarCode))
                 {
                     if (request.TransactionId != TransactionId)
@@ -449,7 +452,7 @@ namespace POS_API_IDOL.Controllers
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("OrderTotal Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.TransactionId))
                 {
                     if (request.TransactionId != TransactionId)
@@ -505,7 +508,7 @@ namespace POS_API_IDOL.Controllers
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("AddPayment Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.TransactionId) && request.Amount > 0)
                 {
                     if (request.TransactionId != TransactionId)
@@ -565,7 +568,7 @@ namespace POS_API_IDOL.Controllers
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("PrintReceipt Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.TransactionId))
                 {
                     if (request.TransactionId != TransactionId)
@@ -632,6 +635,7 @@ namespace POS_API_IDOL.Controllers
                         Vat = cartProducts.Total.TotalVat,
                         Receipt = receipt
                     };
+                    _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(payment));
                     return Ok(payment);
                 }
                 else
@@ -673,7 +677,7 @@ namespace POS_API_IDOL.Controllers
             var err = new Error();
             try
             {
-                _logger.LogInformation("Request Log:: " + JsonConvert.SerializeObject(request));
+                _logger.LogInformation("PrintLastReceipt Request Log:: " + JsonConvert.SerializeObject(request));
                 if (request != null && !string.IsNullOrEmpty(request.StoreNo) && !string.IsNullOrEmpty(request.TerminalNo))
                 {
                     if (lastCartProducts == null || lastCartProducts.Products.Count() == 0)
