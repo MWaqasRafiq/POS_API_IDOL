@@ -3,8 +3,6 @@
     public class AddPaymentRequest
     {
         public string TransactionId { get; set; }
-        public string StoreNo { get; set; }
-        public string TerminalNo { get; set; }
         public string PaymentType { get; set; }
         public string BankTransactionId { get; set; }
         public string CardMaskNo { get; set; }

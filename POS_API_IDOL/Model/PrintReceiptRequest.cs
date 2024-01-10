@@ -3,10 +3,8 @@
     public class PrintReceiptRequest
     {
         public string TransactionId { get; set; }
-        public string StoreNo { get; set; }
-        public string TerminalNo { get; set; }
         public string MobileNumber { get; set; }
-        public bool? GoGreen { get; set; }
+        public bool GoGreen { get; set; }
 
     }
 }
