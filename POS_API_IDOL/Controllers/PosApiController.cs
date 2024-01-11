@@ -277,19 +277,21 @@ namespace POS_API_IDOL.Controllers
                             productDetails.Remove(productDetails.Where(x => x.BarCode == product.BarCode).FirstOrDefault());
                         }
 
+                        qty = qty + request.Qty;
+
                         productDetails.Add(new ProductDetail()
                         {
                             BarCode = product.BarCode,
                             Description = product.Description,
                             Description2 = product.Description2,
                             DiscountDesc = product.DiscountDesc,
-                            Price = product.Price,
-                            Vat = product.Vat,
-                            DiscountAmount = product.DiscountAmount,
-                            FinalPrice = product.FinalPrice,
+                            Price = product.Price * qty,
+                            Vat = product.Vat * qty,
+                            DiscountAmount = product.DiscountAmount * qty,
+                            FinalPrice = product.FinalPrice * qty,
                             Weighted = product.Weighted,
                             AgeRestriction = product.AgeRestriction,
-                            Qty = qty + request.Qty
+                            Qty = qty
                         });
                         total = new TransactionTotal()
                         {
@@ -376,7 +378,6 @@ namespace POS_API_IDOL.Controllers
                     var product = products.products.Where(x => x.BarCode == request.BarCode).FirstOrDefault();
                     if (product != null)
                     {
-                        int qty = 0;
                         List<ProductDetail> productDetails = new List<ProductDetail>();
                         TransactionTotal total = new TransactionTotal();
 
