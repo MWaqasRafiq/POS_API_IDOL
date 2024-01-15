@@ -523,6 +523,7 @@ namespace POS_API_IDOL.Controllers
                         _logger.LogError("Unkown transaction  -  TransactionId: " + request.TransactionId);
                         return Unauthorized(err);
                     }
+                    //log the data here
                     return Ok(new AddPaymentResponse()
                     {
                         Code = 1,
@@ -686,10 +687,10 @@ namespace POS_API_IDOL.Controllers
                         err = new Error()
                         {
                             Code = 404,
-                            Message = "No data has found.",
+                            Message = "PrintLastReceipt: No data has found.",
                             Details = "No data has found. PrintLastReceipt > PrintReceiptRequest > lastCartProducts"
                         };
-                        _logger.LogError("No data has found. PrintLastReceipt > PrintReceiptRequest > lastCartProducts");
+                        _logger.LogError("PrintLastReceipt: No data has found. PrintLastReceipt > PrintReceiptRequest > lastCartProducts");
                         return BadRequest(err);
                     }
                     string products = string.Empty;
@@ -737,7 +738,7 @@ namespace POS_API_IDOL.Controllers
                     err = new Error()
                     {
                         Code = 404,
-                        Message = "No data has found.",
+                        Message = "PrintLastReceipt: No data has found.",
                         Details = "No data has found. PrintLastReceipt > PrintReceiptRequest"
                     };
                     _logger.LogError("No data has found. PrintLastReceipt > PrintReceiptRequest");
@@ -749,7 +750,7 @@ namespace POS_API_IDOL.Controllers
                 err = new Error()
                 {
                     Code = 500,
-                    Message = "The server has thrown an exception.",
+                    Message = "PrintLastReceipt: The server has thrown an exception.",
                     Details = ex.Message
                 };
                 _logger.LogError(ex.Message);
